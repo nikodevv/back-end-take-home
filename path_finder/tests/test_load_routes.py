@@ -18,8 +18,12 @@ class LoadsRoutesDataCLICommand(TestCase):
     def test_get_rows_returns_rows_of_data_in_list_format(self):
         with open(self.test_data_path_str) as f:
             rows = RouteCmd.get_rows(self.test_data_path_str)
-            for row_indx, row in enumerate(csv.reader(f, delimiter='')):
-                if (row_indx != 0):
-                    for item_indx, item in enumerate(row):
-                        self.assertEqual(rows[row_indx][item_indx - 1],
-                                         item)
+            for row_indx, row in enumerate(csv.reader(f, delimiter=' ')):
+                if row_indx == 0:
+                    # should not contain columns strings
+                    self.assertNotIn('Airline Id', row)
+                    self.assertNotIn('Origin', row)
+                    self.assertNotIn('Destination', row)
+                for item_indx, item in enumerate(row):
+                    self.assertEqual(rows[row_indx][item_indx],
+                                     item)
