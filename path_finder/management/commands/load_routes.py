@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from path_finder.models import Routes
 import csv
 
 
@@ -9,9 +10,10 @@ class Command(BaseCommand):
         parser.add_argument('path')
 
     def handle(self, *args, **options):
-        # path = options['path']
-        pass
+        path = options['path']
+        Command.save_rows(Command.get_rows(path))
 
+    @staticmethod
     def get_rows(path):
         """
         Takes a path to routes csv file and returns data rows in a list.
@@ -19,3 +21,9 @@ class Command(BaseCommand):
         with open(path) as f:
             data = [row for row in csv.reader(f, delimiter=' ')]
         return data
+
+    @staticmethod
+    def save_rows(rows):
+        for row in rows:
+            route = Routes.objects.create(origin=row[1], destination=row[2])
+            route.save()
