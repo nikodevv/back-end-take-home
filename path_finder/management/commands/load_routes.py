@@ -19,7 +19,9 @@ class Command(BaseCommand):
         Takes a path to routes csv file and returns data rows in a list.
         """
         with open(path) as f:
-            data = [row for row in csv.reader(f, delimiter=' ')]
+            reader = csv.reader(f, delimiter=',')
+            next(reader, None)  # Skip the headers of csv file
+            data = [row for row in reader]
         return data
 
     @staticmethod

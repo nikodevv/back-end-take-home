@@ -21,12 +21,9 @@ class LoadsRoutesDataCLICommand(TestCase):
     def test_get_rows_returns_rows_of_data_in_list_format(self):
         with open(self.test_data_path_str) as f:
             rows = load_routes.Command.get_rows(self.test_data_path_str)
-            for row_indx, row in enumerate(csv.reader(f, delimiter=' ')):
-                if row_indx == 0:
-                    # should not contain columns strings
-                    self.assertNotIn('Airline Id', row)
-                    self.assertNotIn('Origin', row)
-                    self.assertNotIn('Destination', row)
+            reader = csv.reader(f, delimiter=',')
+            next(reader, None)
+            for row_indx, row in enumerate(reader):
                 for item_indx, item in enumerate(row):
                     self.assertEqual(rows[row_indx][item_indx],
                                      item)
