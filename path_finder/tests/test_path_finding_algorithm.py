@@ -5,18 +5,24 @@ from path_finder.utility.PathSearch import PathSearcher
 
 
 class TestPathFindingAlgorithm(TestCase):
+
     def setUp(self):
         # Load test data to database
         call_command('load_routes', './data/test/routes.csv')
 
     def test_queries_next_depth_level_of_flights(self):
-        # There are 3 routes in test data file that orignate from YYZ
-        # (YYZ -> JFK), (JFK -> LAX), (JFK -> YYZ)
-        origins = [route for route in Routes.objects.filter(origin="YYZ")] + [route for route in Routes.objects.filter(origin="JFK")]
+        origins = Routes.objects.filter(origin="YYZ")
         searcher = PathSearcher()
         traversed = []
         routes = searcher.find_routes_from_origins(origins, traversed)
-        self.assertEqual(len(routes), 3)
+        self.assertEqual(len(routes), 2)
+
+    def test_doesnt_query_traversed_flights(self):
+        origins = Routes.objects.filter(origin="YYZ")
+        searcher = PathSearcher()
+        traversed = [2]
+        routes = searcher.find_routes_from_origins(origins, traversed)
+        self.assertEqual(len(routes), 1)
 
     def test_builds_minimal_graph_that_contains_destination(self):
         searcher = PathSearcher()
@@ -28,7 +34,7 @@ class TestPathFindingAlgorithm(TestCase):
         Routes.objects.create(origin="222", destination="JFK").save()
         Routes.objects.create(origin="JFK", destination="111").save()
         Routes.objects.create(origin="333", destination="333").save()
-        self.assertEqual(len(Routes.objects.all()),10)
+        self.assertEqual(len(Routes.objects.all()), 10)
 
         searcher.build_graph("YYZ", "333")
         # print(searcher.graph.graph)

@@ -19,19 +19,16 @@ class PathSearcher():
         next_level_of_paths = self.find_initial_routes_from_origin_string(
             origin_str, )
         while next_level_of_paths != []:
-            print("OLAYYY")
             for path in next_level_of_paths:
                 traversed.append(path.id)
                 self.graph.add_edge(path.origin, path.destination)
                 if (path.destination == destination):
                     return
 
-            # [print (dest.destination) for dest in next_level_of_paths]
             temp = self.find_routes_from_origins(
                 next_level_of_paths,
                 traversed)
             next_level_of_paths = temp
-            # [print (dest.destination) for dest in next_level_of_paths]
         self.valid_path_exists = False
 
     def find_shortest_path(self):
