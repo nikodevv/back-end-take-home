@@ -4,7 +4,7 @@ import csv
 
 
 class Command(BaseCommand):
-    help = 'Adds a user to django'
+    help = 'Adds routes to database from a csv file'
 
     def add_arguments(self, parser):
         parser.add_argument('path')
