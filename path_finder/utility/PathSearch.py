@@ -12,12 +12,16 @@ class PathSearcher():
     def __init__(self):
         self.valid_path_exists = True
         self.graph = None
+        self.errors = []
 
     def build_graph(self, origin_str, destination):
+        self.verify_origin_and_destination(origin_str, destination)
         self.graph = Graph(origin_str)
         traversed = []  # Routes that have already been traversed
         next_level_of_paths = self.find_initial_routes_from_origin_string(
             origin_str, )
+        if (len(self.errors) is not 0):
+            return
         while next_level_of_paths != []:
             for path in next_level_of_paths:
                 traversed.append(path.id)
@@ -29,10 +33,31 @@ class PathSearcher():
                 next_level_of_paths,
                 traversed)
             next_level_of_paths = temp
-        self.valid_path_exists = False
 
-    def find_shortest_path(self):
-        pass  # TODO: FINSIH
+        # If entire function finishes then there is no solution
+        self.errors.append("No Route")
+
+    def find_shortest_path(self, origin, destination):
+        """
+        A BFS that finds the shortest path from origin to destination in the
+        in-memory graph.
+        """
+
+        graph = self.graph.graph
+        queue = []
+        queue.append([origin])
+
+        while queue:
+            path = queue.pop(0)
+            last_node = path[-1]
+            if last_node == destination:
+                return path
+
+            for adjacent in graph.get(last_node):
+                if adjacent not in path:
+                    new_path = list(path)
+                    new_path.append(adjacent)
+                    queue.append(new_path)
 
     def find_routes_from_origins(self, origins, traversed):
         """
@@ -55,3 +80,9 @@ class PathSearcher():
 
     def find_initial_routes_from_origin_string(self, origin_str):
         return Routes.objects.filter(Q(origin=origin_str))
+
+    def verify_origin_and_destination(self, origin_str, destination_str):
+        if not Routes.objects.filter(Q(origin=origin_str)):
+            self.errors.append("Invalid Origin")
+        if not Routes.objects.filter(Q(origin=destination_str)):
+            self.errors.append("Invalid Destination")
