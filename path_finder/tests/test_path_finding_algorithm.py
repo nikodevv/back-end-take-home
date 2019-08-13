@@ -13,9 +13,12 @@ class TestPathFindingAlgorithm(TestCase):
         call_command('load_routes', './data/test/routes.csv')
 
     def add_additional_test_database_rows(self):
-        airport_222 = Airports.objects.create(IATA="222").save()
-        airport_111 = Airports.objects.create(IATA="111").save()
-        airport_333 = Airports.objects.create(IATA="333").save()
+        airport_111 = Airports.objects.create(IATA="111")
+        airport_222 = Airports.objects.create(IATA="222")
+        airport_333 = Airports.objects.create(IATA="333")
+        airport_111.save()
+        airport_222.save()
+        airport_333.save()
         YYZ = Airports.objects.get(IATA="YYZ")
         JFK = Airports.objects.get(IATA="JFK")
         Routes.objects.create(origin=YYZ, destination=airport_222).save()
@@ -42,6 +45,7 @@ class TestPathFindingAlgorithm(TestCase):
         searcher.build_graph("YYZ", "JFK")
         # The first id row in test data file is YYZ -> JFK, which should
         # Result in two entries being made
+        self.assertEqual(len(searcher.errors), 0)
         self.assertEqual(len(searcher.graph.graph), 2)
         self.add_additional_test_database_rows()
         self.assertEqual(len(Routes.objects.all()), 10)

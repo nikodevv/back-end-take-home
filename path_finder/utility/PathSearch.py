@@ -1,6 +1,6 @@
 from path_finder.utility.Graph import Graph
 from django.db.models import Q
-from path_finder.models import Routes
+from path_finder.models import Routes, Airports
 
 
 class PathSearcher():
@@ -14,8 +14,8 @@ class PathSearcher():
         self.graph = None
         self.errors = []
 
-    def build_graph(self, origin_str, destination):
-        self.verify_origin_and_destination(origin_str, destination)
+    def build_graph(self, origin_str, destination_str):
+        self.verify_origin_and_destination(origin_str, destination_str)
         self.graph = Graph(origin_str)
         traversed = []  # Routes that have already been traversed
         next_level_of_paths = self.find_initial_routes_from_origin_string(
@@ -25,8 +25,8 @@ class PathSearcher():
         while next_level_of_paths != []:
             for path in next_level_of_paths:
                 traversed.append(path.id)
-                self.graph.add_edge(path.origin, path.destination)
-                if (path.destination == destination):
+                self.graph.add_edge(path.origin.IATA, path.destination.IATA)
+                if (path.destination.IATA == destination_str):
                     return
 
             temp = self.find_routes_from_origins(
@@ -82,7 +82,7 @@ class PathSearcher():
         return Routes.objects.filter(Q(origin=origin_str))
 
     def verify_origin_and_destination(self, origin_str, destination_str):
-        if not Routes.objects.filter(Q(origin=origin_str)):
+        if not Airports.objects.filter(Q(IATA=origin_str)):
             self.errors.append("Invalid Origin")
-        if not Routes.objects.filter(Q(origin=destination_str)):
+        if not Airports.objects.filter(Q(IATA=destination_str)):
             self.errors.append("Invalid Destination")
