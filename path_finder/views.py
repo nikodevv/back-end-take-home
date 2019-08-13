@@ -1,9 +1,12 @@
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views import View
 from path_finder.utility.PathSearch import PathSearcher
+from django.views.decorators.csrf import csrf_exempt
 
 
 class RoutesView(View):
+
+    @csrf_exempt
     def get(self, request):
         origin = self.request.GET.get('origin')
         destination = self.request.GET.get('destination')
