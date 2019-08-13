@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand
-from path_finder.models import Routes, Airports
+from path_finder.models import Airports
 import csv
 
 
 class Command(BaseCommand):
-    help = 'Adds routes to database from a csv file'
+    help = 'Adds airports to database from a csv file'
 
     def add_arguments(self, parser):
         parser.add_argument('path')
@@ -27,8 +27,5 @@ class Command(BaseCommand):
     @staticmethod
     def save_rows(rows):
         for row in rows:
-            origin = Airports.objects.get(IATA=row[1])
-            destination = Airports.objects.get(IATA=row[2])
-            route = Routes.objects.create(
-                origin=origin, destination=destination)
-            route.save()
+            airport = Airports.objects.create(IATA=row[3])
+            airport.save()

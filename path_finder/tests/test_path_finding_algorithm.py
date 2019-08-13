@@ -1,5 +1,5 @@
 from django.test import TestCase
-from path_finder.models import Routes
+from path_finder.models import Routes, Airports
 from django.core.management import call_command
 from path_finder.utility.PathSearch import PathSearcher
 from path_finder.utility.Graph import Graph
@@ -9,13 +9,19 @@ class TestPathFindingAlgorithm(TestCase):
 
     def setUp(self):
         # Load test data to database
+        call_command('load_airports', './data/test/airports.csv')
         call_command('load_routes', './data/test/routes.csv')
 
     def add_additional_test_database_rows(self):
-        Routes.objects.create(origin="YYZ", destination="222").save()
-        Routes.objects.create(origin="222", destination="JFK").save()
-        Routes.objects.create(origin="JFK", destination="111").save()
-        Routes.objects.create(origin="333", destination="333").save()
+        airport_222 = Airports.objects.create(IATA="222").save()
+        airport_111 = Airports.objects.create(IATA="111").save()
+        airport_333 = Airports.objects.create(IATA="333").save()
+        YYZ = Airports.objects.get(IATA="YYZ")
+        JFK = Airports.objects.get(IATA="JFK")
+        Routes.objects.create(origin=YYZ, destination=airport_222).save()
+        Routes.objects.create(origin=airport_222, destination=JFK).save()
+        Routes.objects.create(origin=JFK, destination=airport_111).save()
+        Routes.objects.create(origin=airport_333, destination=JFK).save()
 
     def test_queries_next_depth_level_of_flights(self):
         origins = Routes.objects.filter(origin="YYZ")

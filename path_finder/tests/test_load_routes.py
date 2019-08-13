@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from mock import patch
 from path_finder.management.commands import load_routes
-from path_finder.models import Routes
+from path_finder.models import Routes, Airports
 
 
 class LoadsRoutesDataCLICommand(TestCase):
@@ -50,9 +50,20 @@ class LoadsRoutesDataCLICommand(TestCase):
     def test_save_rows_saves_all_rows(self):
         routes_list = [
             ['Airlane', 'YYZ', 'JFK'],
-            ['SomeOtherAirline', 'ORD', 'SOF'],
+            ['SomeOtherAirline', 'JFK', 'SOF'],
             ['AnotherOne', 'MEX', 'CPH'],
         ]
+
+        # Create models for airports
+        test_airports = []
+        for route in routes_list:
+            if route[1] not in test_airports:
+                Airports.objects.create(IATA=route[1])
+                test_airports.append(route[1])
+            if route[2] not in test_airports:
+                Airports.objects.create(IATA=route[2])
+                test_airports.append(route[2])
+
         saved_routes = Routes.objects.all()
         self.assertEqual(len(saved_routes), 0)
 
@@ -60,5 +71,5 @@ class LoadsRoutesDataCLICommand(TestCase):
         saved_routes = Routes.objects.all()
         self.assertEqual(len(saved_routes), len(routes_list))
         for i, route in enumerate(routes_list):
-            self.assertEqual(route[1], saved_routes[i].origin)
-            self.assertEqual(route[2], saved_routes[i].destination)
+            self.assertEqual(route[1], saved_routes[i].origin.IATA)
+            self.assertEqual(route[2], saved_routes[i].destination.IATA)
