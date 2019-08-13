@@ -12,7 +12,7 @@ class PathSearcher():
     def __init__(self):
         self.valid_path_exists = True
         self.graph = None
-        self.errors = []
+        self.errors_list = []
 
     def build_graph(self, origin_str, destination_str):
         self.verify_origin_and_destination(origin_str, destination_str)
@@ -20,7 +20,7 @@ class PathSearcher():
         traversed = []  # Routes that have already been traversed
         next_level_of_paths = self.find_initial_routes_from_origin_string(
             origin_str, )
-        if (len(self.errors) is not 0):
+        if (len(self.errors()) is not 0):
             return
         while next_level_of_paths != []:
             for path in next_level_of_paths:
@@ -35,7 +35,7 @@ class PathSearcher():
             next_level_of_paths = temp
 
         # If entire function finishes then there is no solution
-        self.errors.append("No Route")
+        self.log_error("No Route")
 
     def find_shortest_path(self, origin, destination):
         """
@@ -83,6 +83,12 @@ class PathSearcher():
 
     def verify_origin_and_destination(self, origin_str, destination_str):
         if not Airports.objects.filter(Q(IATA=origin_str)):
-            self.errors.append("Invalid Origin")
+            self.log_error("Invalid Origin")
         if not Airports.objects.filter(Q(IATA=destination_str)):
-            self.errors.append("Invalid Destination")
+            self.log_error("Invalid Destination")
+
+    def log_error(self, error_msg):
+        self.errors_list.append(error_msg)
+
+    def errors(self):
+        return self.errors_list

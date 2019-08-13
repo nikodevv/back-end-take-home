@@ -45,7 +45,7 @@ class TestPathFindingAlgorithm(TestCase):
         searcher.build_graph("YYZ", "JFK")
         # The first id row in test data file is YYZ -> JFK, which should
         # Result in two entries being made
-        self.assertEqual(len(searcher.errors), 0)
+        self.assertEqual(len(searcher.errors()), 0)
         self.assertEqual(len(searcher.graph.graph), 2)
         self.add_additional_test_database_rows()
         self.assertEqual(len(Routes.objects.all()), 10)
@@ -93,21 +93,21 @@ class TestPathFindingAlgorithm(TestCase):
 
     def test_invalid_origin_error_is_added_to_errors_list(self):
         searcher = PathSearcher()
-        self.assertEqual(len(searcher.errors), 0)
+        self.assertEqual(len(searcher.errors()), 0)
         searcher.verify_origin_and_destination("QE4", "YYZ")
-        self.assertEqual(searcher.errors[0], "Invalid Origin")
+        self.assertEqual(searcher.errors()[0], "Invalid Origin")
 
     def test_invalid_destination_error_is_added_to_errors_list(self):
         searcher = PathSearcher()
-        self.assertEqual(len(searcher.errors), 0)
+        self.assertEqual(len(searcher.errors()), 0)
         searcher.verify_origin_and_destination("YYZ", "QE4")
-        self.assertEqual(searcher.errors[0], "Invalid Destination")
+        self.assertEqual(searcher.errors()[0], "Invalid Destination")
 
     def test_build_graph_sets_no_route_error(self):
         searcher = PathSearcher()
         searcher.build_graph("YYZ", "ORD")
-        self.assertIn("No Route", searcher.errors)
-        self.assertEqual(searcher.errors[0], "No Route")
+        self.assertIn("No Route", searcher.errors())
+        self.assertEqual(searcher.errors()[0], "No Route")
 
     def test_use_cases_given_in_github_README(self):
 
@@ -122,19 +122,19 @@ class TestPathFindingAlgorithm(TestCase):
 
         searcher.build_graph("YYZ", "ORD")
         self.assertEqual(searcher.find_shortest_path("YYZ", "ORD"), None)
-        self.assertEqual(len(searcher.errors), 1)
-        self.assertEqual(searcher.errors[0], "No Route")
+        self.assertEqual(len(searcher.errors()), 1)
+        self.assertEqual(searcher.errors()[0], "No Route")
 
-        searcher.errors = []  # Reset errors
+        searcher.errors_list = []  # Reset errors
         searcher.build_graph("XXX", "ORD")
-        self.assertEqual(len(searcher.errors), 1)
+        self.assertEqual(len(searcher.errors()), 1)
         self.assertEqual(searcher.find_shortest_path("XXX", "ORD"), None)
-        self.assertEqual(len(searcher.errors), 1)
-        self.assertEqual(searcher.errors[0], "Invalid Origin")
+        self.assertEqual(len(searcher.errors()), 1)
+        self.assertEqual(searcher.errors()[0], "Invalid Origin")
 
-        searcher.errors = []  # Reset errors
+        searcher.errors_list = []  # Reset errors
         searcher.build_graph("ORD", "XXX")
-        self.assertEqual(len(searcher.errors), 1)
+        self.assertEqual(len(searcher.errors()), 1)
         self.assertEqual(searcher.find_shortest_path("ORD", "XXX"), None)
-        self.assertEqual(len(searcher.errors), 1)
-        self.assertEqual(searcher.errors[0], "Invalid Destination")
+        self.assertEqual(len(searcher.errors()), 1)
+        self.assertEqual(searcher.errors()[0], "Invalid Destination")
