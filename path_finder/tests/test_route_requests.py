@@ -45,3 +45,11 @@ class TestRouteView(TestCase):
         view = RoutesView()
         self.assertEqual(view.formatted_path(l1), val1)
         self.assertEqual(view.formatted_path(l2), val2)
+
+    @patch.object(PathSearcher, 'build_graph')
+    @patch.object(PathSearcher, 'find_shortest_path')
+    @patch.object(RoutesView, 'formatted_path', return_value="testVal123")
+    def test_returns_shortest_path_with_200(self, *args):
+        response = self.client.get(f'{endpoint}?origin=YYZ&destination=JFK')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, bytes('testVal123', 'utf-8'))
