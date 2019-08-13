@@ -21,7 +21,7 @@ class RoutesView(View):
 
         return HttpResponse(self.formatted_path(path))
 
-    def formatted_path(path):
+    def formatted_path(self, path):
 
         route = ""
         for i, airport in enumerate(path):

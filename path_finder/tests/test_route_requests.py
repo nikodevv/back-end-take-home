@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from mock import patch
 from path_finder.utility.PathSearch import PathSearcher
+from path_finder.views import RoutesView
 
 
 endpoint = "/api/v1/find_route"
@@ -34,3 +35,13 @@ class TestRouteView(TestCase):
         response = self.client.get(f'{endpoint}?origin=YYZ&destination=ORD')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.content, bytes("SOME_ERROR", "utf-8"))
+
+    def test_formats_paths_correctly(self):
+        l1 = ["x", "e", "6"]
+        l2 = ["JFK", "YYZ"]
+        val1 = "x -> e -> 6"
+        val2 = "JFK -> YYZ"
+
+        view = RoutesView()
+        self.assertEqual(view.formatted_path(l1), val1)
+        self.assertEqual(view.formatted_path(l2), val2)
